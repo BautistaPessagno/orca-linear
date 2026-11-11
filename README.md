@@ -7,6 +7,8 @@ comment, or start a workspace for it. A status bar item counts what is in progre
 
 Not affiliated with Linear. It uses Orca's own Linear connection, so there is nothing to set up.
 
+![My issues, an issue with its comments, and the current cycle, in Orca's dark theme (made-up issues)](images/panel-dark.png)
+
 ## What you get
 
 - **My issues**, grouped the way Linear groups them: In Progress, In Review, Todo, Backlog, then
