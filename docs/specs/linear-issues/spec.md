@@ -162,3 +162,21 @@ and `check` pass; screenshots of list, detail, empty, error and setup states in 
 ## Out of scope
 
 Creating issues, editing labels, estimates or due dates, webhooks, offline writes.
+
+## Decided while building
+
+- **Cycle view** shows a summary card (cycle number, dates, days left, done / started / to do by
+  issue count) above the groups. Without an API key it shows why and offers to add one.
+- **Lasting refresh failures** (no key, no connection, no CLI) drop the cached list, so the panel
+  shows the reason instead of an old list.
+- **Lost requests**: a panel read sent while the worker restarts times out after 25 s and is sent
+  once more. Writes are never resent.
+- **Light theme**: Linear's light-grey state colours (Todo, Backlog) are swapped for a mid grey on
+  light themes, and very dark ones on dark themes.
+- **Screenshots** use made-up data: with the git-ignored `.scratch/fixtures.json`, the worker
+  serves `scripts/fixture-backend.mjs` and keeps its cache under a separate storage prefix.
+  Orca's `plugin shot --theme light` only works with Orca's window hidden, so light theme was
+  checked by rendering the same panel files in headless Chrome with a stub `orca` and light
+  `--orca-*` tokens.
+- **Workspace ids**: the CLI's workspace id is assumed to equal Linear's organization id, which is
+  what an API key reports; that merge is untested against a real key.
