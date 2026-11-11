@@ -42,7 +42,7 @@ All issues, teams and people in these images are made up.
 Needs Orca 1.4.248 or newer, with Linear connected in Orca's settings.
 
 1. In Orca: Settings → Plugins → **Install plugin** → Git URL →
-   `https://github.com/BautistaPessagno/orca-linear`.
+   `https://github.com/BautistaPessagno/orca-linear#v0.1.0`.
 2. Full-access plugins need Orca's setting that allows them (off by default).
 3. Review what it asks for and click **Enable**:
    - its own storage, settings and encrypted secrets (the issue cache, your settings, API keys);
