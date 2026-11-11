@@ -59,7 +59,7 @@ export default function activate(orca, deps = {}) {
   if (fixtures) {
     log('using made-up fixture data (.scratch/fixtures.json)')
     selector = fixtureSelector(fixtures)
-    keys = { list: async () => selector.keys(), add: async () => ({ id: 'ws-side', name: 'side-project' }), remove: async () => {} }
+    keys = { list: async () => selector.keys(), add: async () => ({ id: 'ws-acme', name: 'acme' }), remove: async () => {} }
     host = {
       call: async (method, params) =>
         method === 'workspace.readContext' && fixtures.focusBranch ? { branch: fixtures.focusBranch, displayName: 'eng-142', terminals: [] } : orca.host.call(method, params)

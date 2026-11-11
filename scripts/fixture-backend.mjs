@@ -127,11 +127,11 @@ const scoped = (issues, ws, q) =>
   issues.filter((i) => (ws === 'all' || i.workspace.id === ws) && (!q.team || i.team.id === q.team) && (!q.project || i.project?.id === q.project))
 
 export function createFixtureSelector({ config = {} } = {}) {
-  const keyed = config.noKeys ? [] : [SIDE]
+  const keyed = config.noKeys ? [] : [ACME]
   return {
     mode: async () => 'auto',
     async workspaces() {
-      return { workspaces: [{ ...ACME, backend: 'cli', cycles: false }, { ...SIDE, backend: config.noKeys ? 'cli' : 'api', cycles: !config.noKeys }], errors: [] }
+      return { workspaces: [{ ...ACME, backend: config.noKeys ? 'cli' : 'api', cycles: !config.noKeys }, { ...SIDE, backend: 'cli', cycles: false }], errors: [] }
     },
     keys: () => keyed,
     async teams(ws) {

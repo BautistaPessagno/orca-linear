@@ -370,6 +370,7 @@ function renderMain() {
   if (state.list?.partial) nodes.push(h('div', { class: 'notice', text: 'Linear sent part of this list. Narrow it with a team or project to see the rest.' }))
 
   const issues = visibleIssues()
+  if (state.ui.view === 'cycle' && !state.search && state.list?.issues?.length) nodes.push(cycleCard(state.list.issues))
   if (state.search) {
     nodes.push(groupHead({ id: 'search', name: `Results for “${state.search.text}”`, type: 'unstarted', issues }, false, true))
     for (const issue of issues) nodes.push(issueRow(issue))
@@ -389,6 +390,34 @@ function renderMain() {
   main.replaceChildren(...nodes)
   if (state.selected >= rowIssues.length) state.selected = rowIssues.length - 1
   markSelected(false)
+}
+
+// The cycle's number, dates and progress, as Linear shows it above a cycle.
+function cycleCard(issues) {
+  const cycles = new Map()
+  for (const i of issues) if (i.cycle?.id) cycles.set(i.cycle.id, i.cycle)
+  const cycle = cycles.size === 1 ? [...cycles.values()][0] : null
+  const scope = issues.filter((i) => !['canceled', 'duplicate'].includes(i.state?.type))
+  const total = scope.length
+  const done = scope.filter((i) => i.state?.type === 'completed').length
+  const started = scope.filter((i) => i.state?.type === 'started').length
+  const pct = (n) => (total ? Math.round((n / total) * 100) : 0)
+  const day = (iso) => (iso ? dueLabel(iso.slice(0, 10)) : '')
+  const left = cycle?.endsAt ? Math.ceil((Date.parse(cycle.endsAt) - Date.now()) / 86_400_000) : null
+  return h(
+    'div',
+    { class: 'cycle-card' },
+    h(
+      'div',
+      { class: 'top' },
+      glyph(ICONS.cycle),
+      h('b', { text: cycles.size > 1 ? `${cycles.size} active cycles` : cycleLabel(cycle) }),
+      cycle?.startsAt ? h('span', { class: 'dates', text: `${day(cycle.startsAt)} → ${day(cycle.endsAt)}${left !== null && left >= 0 ? ` · ${left} day${left === 1 ? '' : 's'} left` : ''}` }) : null,
+      h('span', { class: 'pct', text: `${pct(done)}% done` })
+    ),
+    h('div', { class: 'track', role: 'img', 'aria-label': `${pct(done)}% done, ${pct(started)}% started` }, h('i', { style: `width:${pct(done)}%;background:var(--accent)` }), h('i', { style: `width:${pct(started)}%;background:#f2c94c` })),
+    h('div', { class: 'legend' }, h('span', {}, h('i', { style: 'background:var(--accent)' }), `${done} done`), h('span', {}, h('i', { style: 'background:#f2c94c' }), `${started} started`), h('span', {}, h('i', { style: 'background:var(--faint);outline:1px solid var(--line)' }), `${total - done - started} to do`))
+  )
 }
 
 function groupHead(group, collapsed, flat = false) {
@@ -939,9 +968,11 @@ function openMenu(anchor, items, onPick, { filter = items.length > 7, placeholde
   el.style.top = `${r.bottom + 4 + hgt > window.innerHeight - 8 ? Math.max(8, r.top - hgt - 4) : r.bottom + 4}px`
   anchor.setAttribute('aria-expanded', 'true')
   menu = { el, anchor }
-  ;(input ?? list.querySelector('.item') ?? el).focus()
-  if (!input) el.tabIndex = -1
-  if (!input) el.focus()
+  if (input) input.focus()
+  else {
+    el.tabIndex = -1
+    el.focus()
+  }
 }
 
 document.addEventListener('mousedown', (e) => {
