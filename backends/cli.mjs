@@ -14,15 +14,15 @@ const LIST_LIMIT = 250
 const TEAMS_TTL_MS = 10 * 60_000
 
 // Runs one `orca` command and returns its `result`. Arguments go straight to execFile (no
-// shell); `stdin` carries a comment body. The executable is found once and found again if it
-// disappears (Orca moved or updated).
+// shell); `stdin` carries a comment body and `cwd` picks the folder (start work). The executable
+// is found once and found again if it disappears (Orca moved or updated).
 export function createCliRunner({ locate, execFileImpl = execFile, timeoutMs = TIMEOUT_MS }) {
   let path = null
   const resolve = async () => (path ??= await locate())
 
-  const once = (bin, args, stdin) =>
+  const once = (bin, args, stdin, cwd) =>
     new Promise((done, fail) => {
-      const child = execFileImpl(bin, [...args, '--json'], { timeout: timeoutMs, maxBuffer: MAX_OUTPUT, windowsHide: true }, (error, stdout, stderr) => {
+      const child = execFileImpl(bin, [...args, '--json'], { timeout: timeoutMs, maxBuffer: MAX_OUTPUT, windowsHide: true, ...(cwd ? { cwd } : {}) }, (error, stdout, stderr) => {
         if (error?.code === 'ENOENT') return fail(Object.assign(new Error('missing'), { missing: true }))
         let reply
         try {
@@ -39,15 +39,18 @@ export function createCliRunner({ locate, execFileImpl = execFile, timeoutMs = T
       }
     })
 
-  return async function run(args, { stdin } = {}) {
+  const run = async function run(args, { stdin, cwd } = {}) {
     try {
-      return await once(await resolve(), args, stdin)
+      return await once(await resolve(), args, stdin, cwd)
     } catch (error) {
       if (!error.missing) throw error
       path = null
-      return once(await resolve(), args, stdin)
+      return once(await resolve(), args, stdin, cwd)
     }
   }
+  // Forget the executable, e.g. after the Orca CLI path setting changed.
+  run.reset = () => (path = null)
+  return run
 }
 
 export function cliError(error) {

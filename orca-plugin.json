@@ -1,0 +1,90 @@
+{
+  "$schema": "https://raw.githubusercontent.com/stablyai/orca/main/docs/schemas/plugins/orca-plugin.v2.schema.json",
+  "manifestVersion": 2,
+  "execution": "trusted-worker",
+  "id": "linear-issues",
+  "name": "Linear Issues",
+  "version": "0.1.0",
+  "description": "Your Linear issues in Orca's sidebar: everything assigned to you grouped by status, the current cycle, the team's backlog and triage, with issue details, comments and quick changes, plus a status bar count. Works through Orca's own Linear connection, no setup. Not affiliated with Linear.",
+  "author": {
+    "name": "Bautista Pessagno",
+    "url": "https://github.com/BautistaPessagno"
+  },
+  "repository": "https://github.com/BautistaPessagno/orca-linear",
+  "license": "MIT",
+  "engines": {
+    "orca": ">=1.4.248"
+  },
+  "pluginApi": 1,
+  "main": "worker.mjs",
+  "capabilities": [
+    { "kind": "storage:own" },
+    { "kind": "secrets:own" },
+    { "kind": "settings:own" },
+    { "kind": "workspace:read" },
+    { "kind": "workspace:write" },
+    { "kind": "notifications:show" }
+  ],
+  "contributes": {
+    "panels": [
+      {
+        "id": "issues",
+        "title": "Linear Issues",
+        "icon": "layers",
+        "entry": "panel/index.html"
+      }
+    ],
+    "statusBarItems": [
+      {
+        "id": "linear",
+        "icon": "activity",
+        "text": "Linear",
+        "tooltip": "Linear Issues"
+      }
+    ],
+    "settings": [
+      {
+        "key": "backend",
+        "title": "Connection",
+        "description": "How the plugin reaches Linear. Auto uses Orca's own Linear connection, and a Linear API key for any workspace you added one for in the panel (needed for the current cycle).",
+        "type": "string",
+        "default": "auto",
+        "enum": ["auto", "cli", "api"],
+        "enumLabels": ["Auto", "Orca's Linear connection only", "Linear API keys only"]
+      },
+      {
+        "key": "refreshMinutes",
+        "title": "Refresh every (minutes)",
+        "description": "How often your issues and the status bar count refresh in the background.",
+        "type": "integer",
+        "default": 5,
+        "minimum": 1,
+        "maximum": 60
+      },
+      {
+        "key": "completedDays",
+        "title": "Show completed work from the last (days)",
+        "description": "Completed and canceled issues updated within this many days stay in the list, collapsed at the bottom.",
+        "type": "integer",
+        "default": 14,
+        "minimum": 1,
+        "maximum": 90
+      },
+      {
+        "key": "notifyAssigned",
+        "title": "Notify me of new assignments",
+        "description": "Show a desktop notification when an issue is newly assigned to you.",
+        "type": "boolean",
+        "default": false
+      },
+      {
+        "key": "orcaPath",
+        "title": "Orca CLI path",
+        "description": "Only if the plugin cannot find Orca's command line tool on its own, for example /Applications/Orca.app/Contents/Resources/bin/orca.",
+        "type": "string",
+        "maxLength": 1024,
+        "placeholder": "Found automatically"
+      }
+    ]
+  }
+}
