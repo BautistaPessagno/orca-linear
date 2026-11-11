@@ -152,7 +152,12 @@ export function createFixtureSelector({ config = {} } = {}) {
       else if (q.view === 'created') issues = pool.filter((i) => i.creator?.id === PEOPLE.me.id && i.assignee?.id !== PEOPLE.me.id).concat(ISSUES.slice(0, 4))
       else if (q.view === 'backlog') issues = pool.filter((i) => i.state.type === 'backlog')
       else if (q.view === 'triage') issues = pool.filter((i) => i.state.type === 'triage')
-      else if (q.view === 'cycle') issues = pool.filter((i) => i.cycle?.id === CYCLE.id)
+      else if (q.view === 'cycle') {
+        // As the real selector: cycles only from workspaces with an API key.
+        const withKey = keyed.map((w) => w.id)
+        if (ws === 'all' ? !withKey.length : !withKey.includes(ws)) throw Object.assign(new Error('The current cycle needs a Linear API key for this workspace. Add one in the panel’s settings.'), { kind: 'unsupported' })
+        issues = pool.filter((i) => i.cycle?.id === CYCLE.id && (ws !== 'all' || withKey.includes(i.workspace.id)))
+      }
       else issues = pool.filter((i) => `${i.key} ${i.title}`.toLowerCase().includes(String(q.text).toLowerCase()))
       return { issues: scoped(issues, ws, q), partial: false, errors: [] }
     },

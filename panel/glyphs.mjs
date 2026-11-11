@@ -4,11 +4,35 @@
 const COLOR = /^#[0-9a-fA-F]{3,8}$/
 export const color = (value, fallback = 'currentColor') => (typeof value === 'string' && COLOR.test(value) ? value : fallback)
 
+// State colours are picked for Linear's own background; a very light one vanishes on a light
+// theme and a very dark one on a dark theme. Those fall back to a mid grey.
+let light = false
+export const setLightTheme = (value) => (light = Boolean(value))
+export function luminance(hex) {
+  let h = hex.slice(1)
+  if (h.length === 3 || h.length === 4) h = [...h.slice(0, 3)].map((c) => c + c).join('')
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+const saturation = (hex) => {
+  let h = hex.slice(1)
+  if (h.length === 3 || h.length === 4) h = [...h.slice(0, 3)].map((c) => c + c).join('')
+  const rgb = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
+  const max = Math.max(...rgb)
+  return max === 0 ? 0 : (max - Math.min(...rgb)) / max
+}
+export function readable(value, fallback) {
+  const c = color(value, fallback)
+  if (!c.startsWith('#')) return c
+  const l = luminance(c)
+  return (light && l > 0.45 && saturation(c) < 0.2) || (!light && l < 0.04) ? '#8a8f98' : c
+}
+
 const svg = (body, size = 14) => `<svg width="${size}" height="${size}" viewBox="0 0 14 14" aria-hidden="true">${body}</svg>`
 
 // type: triage | backlog | unstarted | started | completed | canceled | duplicate; progress 0–1.
 export function statusGlyph(type, stateColor, progress = 0.5) {
-  const c = color(stateColor, type === 'completed' ? '#5e6ad2' : '#8a8f98')
+  const c = readable(stateColor, type === 'completed' ? '#5e6ad2' : '#8a8f98')
   switch (type) {
     case 'backlog':
       return svg(`<circle cx="7" cy="7" r="5.5" fill="none" stroke="${c}" stroke-width="1.5" stroke-dasharray="1.6 1.65"/>`)

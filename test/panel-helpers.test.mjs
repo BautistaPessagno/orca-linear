@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { color, priorityGlyph, statusGlyph } from '../panel/glyphs.mjs'
+import { color, priorityGlyph, readable, setLightTheme, statusGlyph } from '../panel/glyphs.mjs'
 import { inline, parseMarkdown, safeUrl } from '../panel/markdown.mjs'
 
 test('markdown blocks: headings, lists, quotes, code, rules and paragraphs', () => {
@@ -38,4 +38,14 @@ test('glyphs take only real colours', () => {
   assert.ok(!statusGlyph('started', '"><script>alert(1)</script>').includes('<script>'))
   for (const type of ['triage', 'backlog', 'unstarted', 'started', 'completed', 'canceled', 'duplicate', 'other']) assert.match(statusGlyph(type, '#123456', 0.4), /^<svg/)
   for (const p of [0, 1, 2, 3, 4, 9]) assert.match(priorityGlyph(p), /^<svg/)
+})
+
+test('state colours that vanish on the theme become grey', () => {
+  setLightTheme(true)
+  assert.equal(readable('#e2e2e2'), '#8a8f98')
+  assert.equal(readable('#f2c94c'), '#f2c94c')
+  assert.equal(readable('#bec2c8'), '#8a8f98')
+  setLightTheme(false)
+  assert.equal(readable('#e2e2e2'), '#e2e2e2')
+  assert.equal(readable('#050505'), '#8a8f98')
 })

@@ -2,7 +2,7 @@
 // Linear is untrusted text and reaches the page through textContent. Glyph SVG strings come from
 // glyphs.mjs, built from numbers and checked colours only.
 import { DONE_TYPES, PRIORITIES, dueState, groupIssues, isOpen, matchesText, stateProgress } from '../src/model.mjs'
-import { ICONS, color, priorityGlyph, statusGlyph } from './glyphs.mjs'
+import { ICONS, color, priorityGlyph, setLightTheme, statusGlyph } from './glyphs.mjs'
 import { parseMarkdown } from './markdown.mjs'
 
 const $ = (id) => document.getElementById(id)
@@ -1082,10 +1082,15 @@ async function reloadApp() {
 orca.plugin.on('issues.changed', ({ key } = {}) => {
   if (key === '*' || key === state.list?.key) loadList({ quiet: true })
 })
-orca.plugin.on('issues.failed', ({ message } = {}) => {
+orca.plugin.on('issues.failed', ({ key, message, kind } = {}) => {
   state.refreshing = false
-  if (state.list) state.list.errors = [message]
+  if (key !== state.list?.key) return renderChrome()
+  if (['unsupported', 'not-connected', 'unauthenticated', 'no-cli'].includes(kind)) {
+    state.list = null
+    state.listError = Object.assign(new Error(message), { kind })
+  } else if (state.list) state.list.errors = [message]
   renderChrome()
+  if (state.route.name === 'list') renderMain()
 })
 orca.on?.('workspace.changed', async () => {
   try {
@@ -1100,7 +1105,17 @@ orca.on?.('workspace.changed', async () => {
 // The relative times in the footer.
 setInterval(() => state.route.name === 'list' && renderFooter(), 30_000)
 
+function applyTheme() {
+  setLightTheme(document.documentElement.classList.contains('light'))
+}
+orca.on?.('theme', () => {
+  applyTheme()
+  renderChrome()
+  renderMain()
+})
+
 async function start() {
+  applyTheme()
   const saved = await orca.storage.get('ui').catch(() => null)
   if (saved && typeof saved === 'object') state.ui = { ...DEFAULT_UI, ...saved, collapsed: { ...(saved.collapsed ?? {}) } }
   renderChrome()

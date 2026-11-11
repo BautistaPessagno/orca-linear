@@ -28,8 +28,11 @@ export const MESSAGES = Object.freeze({
 
 export const bad = (message) => new LinearError('invalid', message)
 
+const KINDS = ['no-cli', 'not-connected', 'unauthenticated', 'unsupported', 'invalid', 'not-found', 'rate-limited', 'error']
+
 export function asLinearError(error) {
   if (error instanceof LinearError) return error
+  if (KINDS.includes(error?.kind)) return new LinearError(error.kind, String(error.message), error.retryAfterMs !== undefined ? { retryAfterMs: error.retryAfterMs } : undefined)
   return new LinearError('error', String(error?.message || error).trim() || 'Something went wrong.')
 }
 

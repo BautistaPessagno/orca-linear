@@ -70,3 +70,25 @@ test('invalidate makes the next ask refresh and tells panels', async () => {
   await new Promise((r) => setImmediate(r))
   assert.equal(fetches.length, 2)
 })
+
+test('a lasting refresh failure drops the cached list and tells the panel why', async () => {
+  let fail = false
+  const storage = fakeStorage()
+  const posts = []
+  let t = 0
+  const store = createIssueStore({
+    storage,
+    now: () => (t += 60_000),
+    post: (e, p) => posts.push([e, p]),
+    fetchList: async () => {
+      if (fail) throw Object.assign(new Error('needs a key'), { kind: 'unsupported' })
+      return { issues: [issue()] }
+    }
+  })
+  await store.list(params)
+  fail = true
+  assert.equal((await store.list(params)).stale, true)
+  await new Promise((r) => setTimeout(r, 5))
+  assert.deepEqual(posts.at(-1), ['issues.failed', { key: listKey(params), message: 'needs a key', kind: 'unsupported' }])
+  assert.equal(storage.values['cache:' + listKey(params)], undefined)
+})

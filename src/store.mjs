@@ -8,6 +8,7 @@ const PREFIX = 'cache:'
 const INDEX = 'cache:index'
 const MAX_LISTS = 24
 const MIN_AGE_MS = 15_000
+const LASTING = ['unsupported', 'not-connected', 'unauthenticated', 'no-cli']
 
 export const listKey = ({ view, workspace = 'all', team = null, project = null }) => `${view}|${workspace}|${team ?? ''}|${project ?? ''}`
 
@@ -56,7 +57,13 @@ export function createIssueStore({ storage, fetchList, post = () => {}, now = Da
       if (cached?.issues) {
         const job = refresh(params)
         if (!job) return { ...cached, key, stale: false }
-        job.then(() => post('issues.changed', { key })).catch((error) => post('issues.failed', { key, message: error.message }))
+        job
+          .then(() => post('issues.changed', { key }))
+          .catch(async (error) => {
+            // A lasting failure (no API key, no connection) outdates the cached list too.
+            if (LASTING.includes(error.kind)) await Promise.resolve(storage.delete(PREFIX + key)).catch(() => {})
+            post('issues.failed', { key, message: error.message, kind: error.kind ?? 'error' })
+          })
         return { ...cached, key, stale: true }
       }
       const fresh = await refresh(params, { force: true })
