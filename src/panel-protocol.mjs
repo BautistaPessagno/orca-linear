@@ -52,7 +52,7 @@ const teamKeyOf = (value) => {
   return value
 }
 
-export function createPanelHandlers({ selector, store, keys, avatars, startWork, host, now = Date.now }) {
+export function createPanelHandlers({ selector, store, keys, avatars, startWork, host, now = Date.now, dev = null }) {
   const metaCache = new Map()
   const details = new Map()
 
@@ -102,7 +102,10 @@ export function createPanelHandlers({ selector, store, keys, avatars, startWork,
         keys.list(),
         focus()
       ])
-      return { workspaces, errors, mode, keys: keyList.map((w) => ({ id: w.id, name: w.name })), focus: focused }
+      const state = { workspaces, errors, mode, keys: keyList.map((w) => ({ id: w.id, name: w.name })), focus: focused }
+      // Screenshots only: where the panel should open (fixture mode).
+      if (dev) state.dev = dev
+      return state
     },
 
     'focus.get': focus,

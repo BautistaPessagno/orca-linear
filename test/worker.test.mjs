@@ -30,7 +30,7 @@ const run = async (args) => {
 
 test('answers every panel request', () => {
   const { orca, handlers } = fakeOrca()
-  activate(orca, { run, poll: false })
+  activate(orca, { run, poll: false, fixtures: null })
   deactivate()
   assert.deepEqual([...handlers.keys()].sort(), [
     'app.state', 'avatar', 'focus.get', 'issue.comment', 'issue.get', 'issue.update', 'issues.list', 'issues.search',
@@ -40,7 +40,7 @@ test('answers every panel request', () => {
 
 test('a fresh My issues list updates the status bar', async () => {
   const { orca, handlers, calls } = fakeOrca()
-  activate(orca, { run, poll: false })
+  activate(orca, { run, poll: false, fixtures: null })
   await handlers.get('issues.list')({ view: 'mine', workspace: 'all' })
   await new Promise((r) => setImmediate(r))
   deactivate()
