@@ -1,0 +1,12 @@
+{
+  "name": "orca-linear-issues",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Orca plugin that shows your Linear issues, cycle and backlog in Orca's sidebar.",
+  "license": "MIT",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "node --test"
+  }
+}
