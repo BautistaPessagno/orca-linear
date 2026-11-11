@@ -28,8 +28,22 @@ function h(tag, attrs, ...children) {
 const glyph = (svg, cls) => h('span', { class: cls, svg, 'aria-hidden': 'true' })
 
 // ---------- worker bridge ----------
+// A read sent while the worker restarts (an update, a re-enable) can be lost; it times out and
+// is sent once more. Writes are never sent twice.
+const RETRY_CODES = ['timeout', 'unavailable']
+const WRITES = ['issue.update', 'issue.comment', 'keys.add', 'keys.remove', 'work.open', 'work.start']
+async function send(name, input, timeoutMs) {
+  try {
+    return await orca.plugin.request(name, input ?? {}, { timeoutMs })
+  } catch (error) {
+    if (WRITES.includes(name) || !RETRY_CODES.includes(error?.code)) throw error
+    return orca.plugin.request(name, input ?? {}, { timeoutMs })
+  }
+}
+
 async function request(name, input) {
-  const out = await (input === undefined ? orca.plugin.request(name) : orca.plugin.request(name, input, { timeoutMs: 90_000 }))
+  // Writes and the first CLI call can take a while; reads answer from the cache.
+  const out = await send(name, input, /^(issue\.|keys\.|work\.|issues\.search)/.test(name) ? 60_000 : 25_000)
   if (out && typeof out === 'object' && out.error && !Array.isArray(out)) {
     throw Object.assign(new Error(out.error.message), { kind: out.error.kind, retryAfterMs: out.error.retryAfterMs })
   }
@@ -54,7 +68,7 @@ const state = {
   metas: new Map(),
   list: null,
   listError: null,
-  loading: false,
+  loading: true,
   refreshing: false,
   text: '',
   search: null,

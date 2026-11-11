@@ -10,7 +10,7 @@ export const ITEM_ID = 'linear'
 export const MINE = Object.freeze({ view: 'mine', workspace: 'all', team: null, project: null })
 const SEEN = 'seenAssigned'
 const MAX_NOTIFY = 3
-const RETRY_MS = 60_000
+const RETRY_MS = 20_000
 
 const minutes = (value, fallback) => (Number.isFinite(value) && value >= 1 && value <= 60 ? value : fallback)
 
