@@ -7,6 +7,9 @@ comment, or start a workspace for it. A status bar item counts what is in progre
 
 Not affiliated with Linear. It uses Orca's own Linear connection, so there is nothing to set up.
 
+**[Open in Orca →](https://onorca.dev/plugins/bautistapessagno.linear-issues)** &nbsp;·&nbsp;
+share link: `orca://plugins/bautistapessagno.linear-issues?catalog=community`
+
 ![The panel in Orca's sidebar beside a terminal: made-up issues grouped by status, the branch's issue pinned on top, and the status bar count](images/cover.png)
 
 ## What you get
@@ -41,7 +44,9 @@ All issues, teams and people in these images are made up.
 
 Needs Orca 1.4.248 or newer, with Linear connected in Orca's settings.
 
-1. In Orca: Settings → Plugins → **Install plugin** → Git URL →
+1. Open [the plugin's page](https://onorca.dev/plugins/bautistapessagno.linear-issues) and click
+   **Open in Orca**, or in Orca: Settings → Plugins → search **Linear Issues** in the community
+   catalog. By hand: **Install plugin** → Git URL →
    `https://github.com/BautistaPessagno/orca-linear#v0.1.0`.
 2. Full-access plugins need Orca's setting that allows them (off by default).
 3. Review what it asks for and click **Enable**:
