@@ -7,7 +7,7 @@ comment, or start a workspace for it. A status bar item counts what is in progre
 
 Not affiliated with Linear. It uses Orca's own Linear connection, so there is nothing to set up.
 
-![My issues, an issue with its comments, and the current cycle, in Orca's dark theme (made-up issues)](images/panel-dark.png)
+![The panel in Orca's sidebar beside a terminal: made-up issues grouped by status, the branch's issue pinned on top, and the status bar count](images/cover.png)
 
 ## What you get
 
@@ -28,6 +28,14 @@ Not affiliated with Linear. It uses Orca's own Linear connection, so there is no
 - **Status bar**: `3 in progress · 1 urgent`, amber while something urgent is open, hidden when
   there is nothing to count.
 - Optional desktop notification when an issue is newly assigned to you.
+
+![My issues grouped by status with the branch's issue pinned on top, and the team backlog, in Orca's light theme](images/my-issues.png)
+
+![An issue with its status picker open, and the same issue scrolled to its sub-issues, links and comments, in Orca's dark theme](images/issue.png)
+
+![The current cycle with its progress in dark theme, and the API key settings in light theme](images/cycle.png)
+
+All issues, teams and people in these images are made up.
 
 ## Install
 
@@ -102,7 +110,9 @@ orca plugin dev watch . --check --shot .orca/shots
 
 Writes are tested against fakes only. With a file `.scratch/fixtures.json` in the folder
 (git-ignored), the worker serves made-up issues instead of yours, for screenshots; see
-`scripts/fixture-backend.mjs`. Research and design: `docs/research/linear-backends.md` and
+`scripts/fixture-backend.mjs`. The images in `images/` (cover, screenshots, icon) are rendered
+from the real panel and worker on that data with `node scripts/render-listing-images.mjs` (needs
+Google Chrome). Research and design: `docs/research/linear-backends.md` and
 `docs/specs/linear-issues/spec.md`.
 
 ## License

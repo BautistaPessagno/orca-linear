@@ -6,6 +6,28 @@
   "name": "Linear Issues",
   "version": "0.1.0",
   "description": "Your Linear issues in Orca's sidebar: everything assigned to you grouped by status, the current cycle, the team's backlog and triage, with issue details, comments and quick changes, plus a status bar count. Works through Orca's own Linear connection, no setup. Not affiliated with Linear.",
+  "icon": "images/icon.png",
+  "cover": {
+    "path": "images/cover.png",
+    "alt": "The panel in Orca's sidebar beside a terminal: made-up issues by status, the branch's issue pinned on top, and the status bar count: 4 in progress, 2 urgent"
+  },
+  "screenshots": [
+    {
+      "path": "images/my-issues.png",
+      "alt": "Two panels in Orca's light theme: My issues grouped into In Progress, In Review, Todo and Backlog with the branch's issue pinned on top, and the team backlog",
+      "caption": "Everything assigned to you, grouped by status"
+    },
+    {
+      "path": "images/issue.png",
+      "alt": "An issue in Orca's dark theme, its status picker open over the details, next to the same issue scrolled to its sub-issues, links and comments",
+      "caption": "Read, comment, and change status, priority or assignee"
+    },
+    {
+      "path": "images/cycle.png",
+      "alt": "The current cycle in dark theme with its progress and days left, next to light theme settings: one workspace on an API key, one on Orca's connection",
+      "caption": "The current cycle, with a Linear API key"
+    }
+  ],
   "author": {
     "name": "Bautista Pessagno",
     "url": "https://github.com/BautistaPessagno"
